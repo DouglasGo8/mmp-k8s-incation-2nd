@@ -38,12 +38,29 @@ image::architecture/thumbs/comprising_deploy_k8s_pod.jpg[]
 
 . Pod object, represents the ##central and most important concept in K8s## - a running instance of your application, pod is a co-located group of containers and the basic building block in Kubernetes, in the K8s we don't deploy containers but groups of them managed as a single unit, ##When a Pod has multiple containers, all of them run on the same worker node##, a single pod instance never spans multiple nodes,
 . Containers are _designed_ to run only a single process, to take full advantage of the features provided by the container runtime, you should consider running only one process in each container.
-. With a pod, you can run closely related processes together, giving them (almost) the same environment as if they were all running in a single container, all containers in a pod share the same Network namespace and thus the network interfaces, IP address(es) and port space that belong to it. Because of the shared port space, processes running in containers of the same pod can’t be bound to the same port numbers, All the containers in a pod also see the same system hostname.
+. With a pod, you can run closely related processes together, giving them (almost) the same environment as if they were all running in a single container, all containers in a pod share the same Network namespace and thus the network interfaces, IP address(es) and port space that belong to it.
+Because of the shared port space, processes running in containers of the same pod can’t be bound to the same port numbers, All the containers in a pod also see the same system hostname.
 . Each pod can be considered as separated vCPu/Cpu, avoid stuffing all your applications into a single pod, you should divide them so that each pod runs only closely related application processes.
-. ##Kubernetes does not replicate containers within a pod. It replicates the entire pod.##
+. ##Kubernetes does not replicate containers within a pod.
+It replicates the entire pod.##
 . You never need to combine multiple applications in a single pod
+
 
 .Containers in a pod sharing the same Network namespace
 image::architecture/thumbs/pod_share_same_network_interface.jpg[]
 
+=== Sidecar Containers
 
+. Several containers in a single pod is only appropriate if the application consists of a primary process and one or more processes that complement the operation of the primary process.
+
+.Sidecar Container in same Pod
+image::architecture/thumbs/sidecar.png[]
+
+=== Create Pod Object
+[source, bash]
+----
+kubectl apply -f basic-manifest.yaml
+kubectl get pod quarkus-hello -o yaml
+kubectl get pod quarkus-hello
+kubectl get pod quarkus-hello -o wide
+----
