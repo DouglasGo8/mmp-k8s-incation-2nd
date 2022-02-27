@@ -5,6 +5,16 @@
 - https://camel.apache.org/components/2.x/kubernetes-component.html[Apache Camel Kubernetes API]
 - https://github.com/Apress/cloud-native-integration-apache-camel[Cloud Native Integration with Apache Camel Git Source]
 
+== Minishift OC env Configuration
+* OC command in Minishift cluster env is the same kubectl command in K8's cluster
+
+[source,bash]
+----
+minishift oc-env
+eval $(minishift oc-env)
+
+----
+
 == Introduction the Kubernetes API using Apache Camel Kubernetes API
 
 .A K8s cluster objects
@@ -56,11 +66,34 @@ image::architecture/thumbs/pod_share_same_network_interface.jpg[]
 .Sidecar Container in same Pod
 image::architecture/thumbs/sidecar.png[]
 
-=== Create Pod Object
+=== Create/Handle Pod Object
+
+[source,bash]
+----
+oc apply -f pod-kiada.yaml
+oc get pod kiada
+oc describe pod kiada
+oc get events
+oc get pod kiada -o wide
+oc run --image=curlimages/curl -it --restart=Never --rm client-pod curl {{IP_POD}}:8080
+oc port-forward kiada 8080
+oc logs kiada
+oc logs kiada -f
+oc logs kiada --timestamps=true
+oc logs kiada --since=2m
+oc logs kiada --since-time=2020-02-01T09:50:00Z
+oc exec kiada -- ps aux
+oc exec kiada -- curl -s localhost:8080
+oc exec kiada curl -s localhost:8080
+oc exec -it kiada -- bash
+oc attach kiada
+oc attach -i kiada-stdin # version two using stdin image
+----
+
+=== Copying files to and from containers
+
 [source, bash]
 ----
-kubectl apply -f basic-manifest.yaml
-kubectl get pod quarkus-hello -o yaml
-kubectl get pod quarkus-hello
-kubectl get pod quarkus-hello -o wide
+oc cp kiada:html/index.html /tmp/index.html
+oc cp /tmp/index.html kiada:html/
 ----
