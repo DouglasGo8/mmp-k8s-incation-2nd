@@ -12,7 +12,6 @@
 ----
 minishift oc-env
 eval $(minishift oc-env)
-
 ----
 
 == Introduction the Kubernetes API using Apache Camel Kubernetes API
@@ -55,7 +54,6 @@ Because of the shared port space, processes running in containers of the same po
 It replicates the entire pod.##
 . You never need to combine multiple applications in a single pod
 
-
 .Containers in a pod sharing the same Network namespace
 image::architecture/thumbs/pod_share_same_network_interface.jpg[]
 
@@ -88,6 +86,15 @@ oc exec kiada curl -s localhost:8080
 oc exec -it kiada -- bash
 oc attach kiada
 oc attach -i kiada-stdin # version two using stdin image
+
+oc port-forward kiada-ssl 8080 8443 990
+oc logs kiada-ssl -c kiada
+oc logs kiada-ssl --all-containers
+oc get pods -w # watch status changing
+
+oc delete po kiada
+oc delete po --all
+oc delete -f pod.kiada.yaml,pod.kiada-ssl.yaml
 ----
 
 === Copying files to and from containers
@@ -97,3 +104,32 @@ oc attach -i kiada-stdin # version two using stdin image
 oc cp kiada:html/index.html /tmp/index.html
 oc cp /tmp/index.html kiada:html/
 ----
+
+== Sidecar pattern
+
+.Sidecar pattern One Pod Two Containers
+image::architecture/thumbs/sidecarpattern.png[]
+
+[source, bash]
+----
+curl https://example.com:8443 --resolve example.com:8443:127.0.0.1 --cacert kiada-ssl-proxy-0.1/example-com.crt
+----
+
+== Pod Lifecycles
+
+[source, bash]
+----
+oc get po kiada -o yaml | grep phase
+oc describe po kiada
+oc get po kiada -o json | jq .status.conditions
+[
+  {
+    "lastProbeTime": null,
+    "lastTransitionTime": "2020-02-02T11:42:59Z",
+    "status": "True",
+    "type": "Initialized"
+  }]
+oc get events -w
+----
+
+* restartPolicy - default #_Always_# | #_OnFailure_# | #_Never_#
