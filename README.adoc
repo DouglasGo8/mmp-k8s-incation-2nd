@@ -122,14 +122,16 @@ curl https://example.com:8443 --resolve example.com:8443:127.0.0.1 --cacert kiad
 oc get po kiada -o yaml | grep phase
 oc describe po kiada
 oc get po kiada -o json | jq .status.conditions
-[
-  {
+[{
     "lastProbeTime": null,
     "lastTransitionTime": "2020-02-02T11:42:59Z",
     "status": "True",
     "type": "Initialized"
   }]
 oc get events -w
+oc logs kiada-liveness -c kiada -f
+oc exec kiada-liveness -c envoy -- tail -f /tmp/envoy.admin.log
+curl -X POST localhost:9901/healthcheck/fail
 ----
 
 * restartPolicy - default #_Always_# | #_OnFailure_# | #_Never_#
