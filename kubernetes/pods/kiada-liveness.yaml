@@ -21,6 +21,7 @@ spec:
           containerPort: 8443
         - name: admin
           containerPort: 9901
+      #
       livenessProbe:
         httpGet:
           path: /ready

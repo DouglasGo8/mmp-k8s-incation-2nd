@@ -64,6 +64,18 @@ image::architecture/thumbs/pod_share_same_network_interface.jpg[]
 .Sidecar Container in same Pod
 image::architecture/thumbs/sidecar.png[]
 
+. Before recipes in minikube cluster
+
+[source, bash]
+----
+# oc
+kubectl create namespace k8s-inaction
+kubectl config set-context --current --namespace=k8s-inaction
+# get current ns
+kubectl config view --minify -o jsonpath='{..namespace}'
+kubectl get all,pvc,configmap,rolebindings,clusterrolebindings,secrets,sa,roles,clusterroles,crd -l 'app=my-label'
+----
+
 === Create/Handle Pod Object
 
 [source,bash]
@@ -120,6 +132,7 @@ curl https://example.com:8443 --resolve example.com:8443:127.0.0.1 --cacert kiad
 [source, bash]
 ----
 oc get po kiada -o yaml | grep phase
+oc get pods -n myproject
 oc describe po kiada
 oc get po kiada -o json | jq .status.conditions
 [{
@@ -128,6 +141,8 @@ oc get po kiada -o json | jq .status.conditions
     "status": "True",
     "type": "Initialized"
   }]
+oc get po kiada -o json | jq .status
+oc get pods -w
 oc get events -w
 oc logs kiada-liveness -c kiada -f
 oc exec kiada-liveness -c envoy -- tail -f /tmp/envoy.admin.log
@@ -135,3 +150,5 @@ curl -X POST localhost:9901/healthcheck/fail
 ----
 
 * restartPolicy - default #_Always_# | #_OnFailure_# | #_Never_#
+
+. Lifecycle hoos, pre-start and pre-stop
